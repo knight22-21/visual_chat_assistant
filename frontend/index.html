@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Upload</title>
+</head>
+<body>
+  <h1>Upload Video</h1>
+  <input type="file" id="videoInput" accept="video/*">
+  <button onclick="uploadVideo()">Upload</button>
+  <p id="status"></p>
+
+  <script>
+    async function uploadVideo() {
+      const input = document.getElementById('videoInput');
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("http://127.0.0.1:8000/upload-video", {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+      document.getElementById("status").innerText = result.message;
+    }
+  </script>
+</body>
+</html>
