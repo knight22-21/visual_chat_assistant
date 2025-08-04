@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from yolo_detector import detect_events
 import os
 
 app = FastAPI()
@@ -13,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "backend/uploads"
+UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/upload-video")
@@ -22,4 +23,10 @@ async def upload_video(file: UploadFile = File(...)):
     with open(filepath, "wb") as f:
         f.write(await file.read())
 
-    return JSONResponse(content={"message": "Video uploaded successfully", "filename": file.filename})
+    events = detect_events(filepath)
+
+    return JSONResponse(content={
+        "message": "Video uploaded and processed successfully",
+        "filename": file.filename,
+        "events": events[:20]  # Return only top 20 for now to keep response small
+    })
