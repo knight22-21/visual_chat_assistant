@@ -1,11 +1,20 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
+from yolov8_infer import run_yolo_on_frames
 import uuid
 import shutil
 import os
 
 from frame_extractor import get_video_duration, extract_frames
+
+BASE_DIR = Path(__file__).resolve().parent.parent  # One level up from current file
+UPLOAD_DIR = BASE_DIR / "videos"
+FRAME_DIR = BASE_DIR / "frames"
+MAX_VIDEO_DURATION = 120  # seconds
+
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+FRAME_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI()
 
@@ -18,13 +27,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BASE_DIR = Path(__file__).resolve().parent.parent  # One level up from current file
-UPLOAD_DIR = BASE_DIR / "videos"
-FRAME_DIR = BASE_DIR / "frames"
-MAX_VIDEO_DURATION = 120  # seconds
-
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-FRAME_DIR.mkdir(parents=True, exist_ok=True)
 
 @app.post("/upload-video")
 async def upload_video(video: UploadFile = File(...)):
@@ -50,4 +52,18 @@ async def upload_video(video: UploadFile = File(...)):
         "message": "Video uploaded and frames extracted",
         "video_path": str(video_path),
         "frames_dir": str(frame_output_dir)
+    }
+
+@app.post("/run-yolo")
+async def run_yolo(video_filename: str):
+    frame_folder = FRAME_DIR / video_filename.split('.')[0]
+    if not frame_folder.exists():
+        raise HTTPException(status_code=404, detail="Frame folder not found")
+
+    output_path = frame_folder / "yolo_output.json"
+    result_path = run_yolo_on_frames(str(frame_folder), str(output_path))
+
+    return {
+        "message": "YOLOv8 inference complete",
+        "yolo_output": str(result_path)
     }

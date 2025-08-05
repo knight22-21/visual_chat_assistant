@@ -1,0 +1,194 @@
+{
+  "frame_0000.jpg": [],
+  "frame_0001.jpg": [],
+  "frame_0002.jpg": [
+    {
+      "label": "bird",
+      "confidence": 0.752,
+      "bbox": [
+        449.87,
+        138.72,
+        1349.76,
+        1064.31
+      ]
+    }
+  ],
+  "frame_0003.jpg": [],
+  "frame_0004.jpg": [],
+  "frame_0005.jpg": [],
+  "frame_0006.jpg": [],
+  "frame_0007.jpg": [],
+  "frame_0008.jpg": [],
+  "frame_0009.jpg": [],
+  "frame_0010.jpg": [
+    {
+      "label": "banana",
+      "confidence": 0.678,
+      "bbox": [
+        795.41,
+        40.09,
+        1806.7,
+        1038.47
+      ]
+    }
+  ],
+  "frame_0011.jpg": [],
+  "frame_0012.jpg": [
+    {
+      "label": "bird",
+      "confidence": 0.654,
+      "bbox": [
+        537.81,
+        275.18,
+        802.44,
+        1056.32
+      ]
+    },
+    {
+      "label": "bird",
+      "confidence": 0.402,
+      "bbox": [
+        540.36,
+        278.46,
+        800.29,
+        673.05
+      ]
+    }
+  ],
+  "frame_0013.jpg": [],
+  "frame_0014.jpg": [
+    {
+      "label": "umbrella",
+      "confidence": 0.672,
+      "bbox": [
+        18.63,
+        0.56,
+        1834.19,
+        1046.55
+      ]
+    }
+  ],
+  "frame_0015.jpg": [
+    {
+      "label": "umbrella",
+      "confidence": 0.685,
+      "bbox": [
+        5.3,
+        1.91,
+        1875.29,
+        1045.79
+      ]
+    }
+  ],
+  "frame_0016.jpg": [
+    {
+      "label": "person",
+      "confidence": 0.295,
+      "bbox": [
+        1.17,
+        6.53,
+        558.65,
+        1064.71
+      ]
+    },
+    {
+      "label": "vase",
+      "confidence": 0.265,
+      "bbox": [
+        471.91,
+        283.58,
+        995.0,
+        1067.4
+      ]
+    }
+  ],
+  "frame_0017.jpg": [],
+  "frame_0018.jpg": [],
+  "frame_0019.jpg": [
+    {
+      "label": "vase",
+      "confidence": 0.677,
+      "bbox": [
+        332.11,
+        11.91,
+        606.68,
+        947.83
+      ]
+    },
+    {
+      "label": "vase",
+      "confidence": 0.267,
+      "bbox": [
+        335.76,
+        552.31,
+        604.66,
+        941.61
+      ]
+    }
+  ],
+  "frame_0020.jpg": [],
+  "frame_0021.jpg": [
+    {
+      "label": "tv",
+      "confidence": 0.914,
+      "bbox": [
+        510.24,
+        223.14,
+        1377.3,
+        836.35
+      ]
+    }
+  ],
+  "frame_0022.jpg": [
+    {
+      "label": "kite",
+      "confidence": 0.471,
+      "bbox": [
+        1422.26,
+        367.48,
+        1555.37,
+        476.48
+      ]
+    }
+  ],
+  "frame_0023.jpg": [],
+  "frame_0024.jpg": [
+    {
+      "label": "tv",
+      "confidence": 0.92,
+      "bbox": [
+        480.78,
+        243.91,
+        1434.45,
+        830.28
+      ]
+    }
+  ],
+  "frame_0025.jpg": [
+    {
+      "label": "tv",
+      "confidence": 0.91,
+      "bbox": [
+        484.73,
+        245.29,
+        1433.25,
+        828.73
+      ]
+    }
+  ],
+  "frame_0026.jpg": [
+    {
+      "label": "tv",
+      "confidence": 0.852,
+      "bbox": [
+        485.19,
+        246.86,
+        1435.87,
+        832.93
+      ]
+    }
+  ],
+  "frame_0027.jpg": [],
+  "frame_0028.jpg": [],
+  "frame_0029.jpg": []
+}
