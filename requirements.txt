@@ -3,3 +3,5 @@ uvicorn
 python-multipart
 ultralytics 
 opencv-python
+transformers
+av

@@ -29,4 +29,8 @@ def run_yolo_on_frames(frames_dir, output_json_path):
     with open(output_json_path, "w") as f:
         json.dump(results_data, f, indent=2)
 
-    return output_json_path
+    # Return both structured dictionary and raw JSON string
+    with open(output_json_path) as f:
+        raw_json = f.read()
+
+    return results_data, raw_json

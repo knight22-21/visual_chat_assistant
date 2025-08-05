@@ -1,14 +1,16 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pathlib import Path
-from yolov8_infer import run_yolo_on_frames
 import uuid
 import shutil
 import os
 
+from yolov8_infer import run_yolo_on_frames
+from movinet_infer import get_actions_from_video
 from frame_extractor import get_video_duration, extract_frames
 
-BASE_DIR = Path(__file__).resolve().parent.parent  # One level up from current file
+BASE_DIR = Path(__file__).resolve().parent.parent
 UPLOAD_DIR = BASE_DIR / "videos"
 FRAME_DIR = BASE_DIR / "frames"
 MAX_VIDEO_DURATION = 120  # seconds
@@ -27,6 +29,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
 
 @app.post("/upload-video")
 async def upload_video(video: UploadFile = File(...)):
@@ -45,14 +50,24 @@ async def upload_video(video: UploadFile = File(...)):
         video_path.unlink()
         raise HTTPException(status_code=400, detail="Video exceeds 2-minute limit")
 
+    # Extract 1 frame per second
     frame_output_dir = FRAME_DIR / video_filename.split('.')[0]
     extract_frames(str(video_path), str(frame_output_dir), frame_rate=1)
 
-    return {
-        "message": "Video uploaded and frames extracted",
-        "video_path": str(video_path),
-        "frames_dir": str(frame_output_dir)
-    }
+    # Object detection
+    yolo_output_path = frame_output_dir / "yolo_output.json"
+    structured, raw = run_yolo_on_frames(str(frame_output_dir), str(yolo_output_path))
+
+    # Action recognition
+    action_results = get_actions_from_video(str(video_path))
+
+    return JSONResponse({
+        "message": "Video uploaded and processed",
+        "filename": video_filename,
+        "structured_events": structured,
+        "action_events": action_results,
+        "raw_events": raw
+    })
 
 @app.post("/run-yolo")
 async def run_yolo(video_filename: str):
@@ -61,9 +76,11 @@ async def run_yolo(video_filename: str):
         raise HTTPException(status_code=404, detail="Frame folder not found")
 
     output_path = frame_folder / "yolo_output.json"
-    result_path = run_yolo_on_frames(str(frame_folder), str(output_path))
+    structured, raw = run_yolo_on_frames(str(frame_folder), str(output_path))
 
     return {
         "message": "YOLOv8 inference complete",
-        "yolo_output": str(result_path)
+        "yolo_output": str(output_path),
+        "structured_events": structured,
+        "raw_events": raw
     }
