@@ -1,11 +1,15 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from yolo_detector import detect_events
+from pathlib import Path
+import uuid
+import shutil
 import os
+
+from frame_extractor import get_video_duration, extract_frames
 
 app = FastAPI()
 
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,19 +18,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+BASE_DIR = Path(__file__).resolve().parent.parent  # One level up from current file
+UPLOAD_DIR = BASE_DIR / "videos"
+FRAME_DIR = BASE_DIR / "frames"
+MAX_VIDEO_DURATION = 120  # seconds
+
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+FRAME_DIR.mkdir(parents=True, exist_ok=True)
 
 @app.post("/upload-video")
-async def upload_video(file: UploadFile = File(...)):
-    filepath = os.path.join(UPLOAD_DIR, file.filename)
-    with open(filepath, "wb") as f:
-        f.write(await file.read())
+async def upload_video(video: UploadFile = File(...)):
+    if not video.filename.lower().endswith(('.mp4', '.avi', '.mov')):
+        raise HTTPException(status_code=400, detail="Unsupported video format")
 
-    events = detect_events(filepath)
+    uid = uuid.uuid4().hex
+    video_filename = f"{uid}_{video.filename}"
+    video_path = UPLOAD_DIR / video_filename
 
-    return JSONResponse(content={
-        "message": "Video uploaded and processed successfully",
-        "filename": file.filename,
-        "events": events[:20]  # Return only top 20 for now to keep response small
-    })
+    with open(video_path, "wb") as f:
+        shutil.copyfileobj(video.file, f)
+
+    duration = get_video_duration(str(video_path))
+    if duration > MAX_VIDEO_DURATION:
+        video_path.unlink()
+        raise HTTPException(status_code=400, detail="Video exceeds 2-minute limit")
+
+    frame_output_dir = FRAME_DIR / video_filename.split('.')[0]
+    extract_frames(str(video_path), str(frame_output_dir), frame_rate=1)
+
+    return {
+        "message": "Video uploaded and frames extracted",
+        "video_path": str(video_path),
+        "frames_dir": str(frame_output_dir)
+    }
