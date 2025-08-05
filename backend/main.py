@@ -9,6 +9,7 @@ import os
 from yolov8_infer import run_yolo_on_frames
 from movinet_infer import get_actions_from_video
 from frame_extractor import get_video_duration, extract_frames
+from blip_infer import caption_multiple_frames
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 UPLOAD_DIR = BASE_DIR / "videos"
@@ -83,4 +84,17 @@ async def run_yolo(video_filename: str):
         "yolo_output": str(output_path),
         "structured_events": structured,
         "raw_events": raw
+    }
+
+
+@app.post("/frame-captions")
+async def get_captions(video_filename: str):
+    frame_folder = FRAME_DIR / video_filename.split('.')[0]
+    if not frame_folder.exists():
+        raise HTTPException(status_code=404, detail="Frame folder not found")
+
+    captions = caption_multiple_frames(str(frame_folder), frame_sample_rate=5)
+    return {
+        "message": "Captions generated for selected frames",
+        "captions": captions
     }
